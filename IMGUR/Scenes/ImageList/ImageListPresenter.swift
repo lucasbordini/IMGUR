@@ -29,7 +29,7 @@ class ImageListPresenterImpl: ImageListPresenter {
             .observeOn(MainScheduler.instance)
             .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak self] albums in
-                self?.view.onSuccess(albums: albums)
+                self?.view.onSuccess(albums: albums, reset: self?.page == 0)
                 }, onError: { [weak self] error in
                     self?.view.onError(error: error as! BaseError)
             }).disposed(by: bag)

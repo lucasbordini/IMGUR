@@ -24,6 +24,7 @@ class ImageListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setColumns()
         setupCollection()
         let repository = ImageRepositoryImpl.shared
         presenter = ImageListPresenterImpl(view: self, repository: repository)
@@ -31,7 +32,7 @@ class ImageListViewController: UIViewController {
     }
     
     private func setupCollection() {
-        imageCollection.register(UINib(nibName: "ImageCCell", bundle: nil),
+        imageCollection.register(UINib(nibName: Constants.NibNames.ImageList.ImageCell.rawValue, bundle: nil),
                                  forCellWithReuseIdentifier: Constants.ReuseIdentifiers.ImageList.ImageCell.rawValue)
         imageCollection.addInfiniteScroll() { [weak self] (tableView) -> Void in
             self?.presenter?.loadMore()
@@ -54,18 +55,23 @@ class ImageListViewController: UIViewController {
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
+        setColumns()
+        imageCollection.layoutSubviews()
+    }
+
+    private func setColumns() {
         if UIDevice.current.orientation.isLandscape {
             columns = 2
         } else {
             columns = 1
         }
-        imageCollection.layoutSubviews()
     }
 }
 
 extension ImageListViewController: ImageListView {
     
-    func onSuccess(albums: [Album]) {
+    func onSuccess(albums: [Album], reset: Bool) {
+        if reset { self.albums.removeAll() }
         self.albums.append(contentsOf: albums)
         imageCollection.reloadData()
         loading.stopAnimating()
@@ -88,7 +94,7 @@ extension ImageListViewController: UICollectionViewDelegate, UICollectionViewDat
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.ReuseIdentifiers.ImageList.ImageCell.rawValue, for: indexPath) as? ImageCCell {
+        if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.ReuseIdentifiers.ImageList.ImageCell.rawValue, for: indexPath) as? ImageCell {
             cell.setup(album: albums[indexPath.row])
             return cell
         }

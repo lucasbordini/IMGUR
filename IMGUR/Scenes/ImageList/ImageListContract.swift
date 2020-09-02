@@ -9,7 +9,7 @@
 import Foundation
 
 protocol ImageListView: class {
-    func onSuccess(albums: [Album])
+    func onSuccess(albums: [Album], reset: Bool)
     func onError(error: BaseError)
 }
 
